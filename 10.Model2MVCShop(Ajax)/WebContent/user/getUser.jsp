@@ -15,7 +15,7 @@
 	<!-- CDN(Content Delivery Network) 호스트 사용 -->
 	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript">
-		
+
 		//==>"수정" "확인"  Event 연결 및 처리
 		 $(function() {
 			//==> DOM Object GET 3가지 방법 ==> 1. $(tagName) : 2.(#id) : 3.$(.className)
@@ -26,11 +26,24 @@
 				history.go(-1);
 			});
 			
-			 $( "td.ct_btn01:contains('수정')" ).on("click" , function() {
+			 $("td.ct_btn01:contains('수정')").on("click" , function() {
 					//Debug..
 					//alert(  $( "td.ct_btn01:contains('수정')" ).html() );
 					self.location = "/user/updateUser?userId=${user.userId}"
 				});
+			 
+			 $("td.ct_write01").each(function(){
+				 //console.log($(this).text().length)
+				// console.log($(this).text().length==0);
+				 if($(this).text().length<2){
+			//	console.log($(this).prev('td').prev('td').html())
+				 var value = $(this).prev('td').prev('td').html()
+				$(this).text(value+"을(를) 등록해주세요")
+				// $(this).prepend("&nbsp;&nbsp;&nbsp;<img id='rabbit0' src='../images/rabbit0.png' height='50' alt='토끼'><br>")
+				 }
+			 })
+			 
+
 		});
 		
 	</script>

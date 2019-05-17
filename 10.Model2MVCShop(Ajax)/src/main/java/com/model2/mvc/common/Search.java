@@ -15,6 +15,11 @@ public class Search {
 	//==> 참조
 	private int endRowNum;
 	private int startRowNum;
+	//추가기능
+	private String sorting;
+	private String searchKeyword1;
+	private String searchKeyword2;
+	private boolean priceSearch;
 	
 	///Constructor
 	public Search() {
@@ -28,6 +33,38 @@ public class Search {
 		this.pageSize = paseSize;
 	}
 	
+	public String getSorting() {
+		return sorting;
+	}
+
+	public void setSorting(String sorting) {
+		this.sorting = sorting;
+	}
+
+	public String getSearchKeyword1() {
+		return searchKeyword1;
+	}
+
+	public void setSearchKeyword1(String searchKeyword1) {
+		this.searchKeyword1 = searchKeyword1;
+	}
+
+	public String getSearchKeyword2() {
+		return searchKeyword2;
+	}
+
+	public void setSearchKeyword2(String searchKeyword2) {
+		this.searchKeyword2 = searchKeyword2;
+	}
+
+	public boolean isPriceSearch() {
+		return priceSearch;
+	}
+
+	public void setPriceSearch(boolean priceSearch) {
+		this.priceSearch = priceSearch;
+	}
+
 	public int getCurrentPage() {
 		return currentPage;
 	}

@@ -46,6 +46,9 @@
 					//self.location ="/user/getUser?userId="+$(this).text().trim();
 					////////////////////////////////////////////////////////////////////////////////////////////
 					var userId = $(this).text().trim();
+					if($( "#"+userId+"" ).html().length!=0){
+						$( "#"+userId+"" ).empty();
+					}else{
 					$.ajax( 
 							{
 								url : "/user/json/getUser/"+userId ,
@@ -71,10 +74,12 @@
 																+"</h3>";
 									//Debug...									
 									//alert(displayValue);
-									$("h3").remove();
+									
 									$( "#"+userId+"" ).html(displayValue);
 								}
-						});
+						}
+					)
+					};
 						////////////////////////////////////////////////////////////////////////////////////////////
 					
 			});

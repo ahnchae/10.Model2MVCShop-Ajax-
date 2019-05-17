@@ -133,14 +133,54 @@
 		 $(function() {
 			//==> DOM Object GET 3가지 방법 ==> 1. $(tagName) : 2.(#id) : 3.$(.className)
 			//==> 1 과 3 방법 조합 : $("tagName.className:filter함수") 사용함.	
-			 $("td.ct_btn:contains('ID중복확인')").on("click" , function() {
-				//alert($("td.ct_btn:contains('ID중복확인')").html());
-				popWin 
-				= window.open("/user/checkDuplication.jsp",
-											"popWin", 
-											"left=300,top=200,width=300,height=200,marginwidth=0,marginheight=0,"+
-											"scrollbars=no,scrolling=no,menubar=no,resizable=no");
+			 $("form table[style] table input[type='text']").on("change" , function() {
+					var userId = $(this).val();
+				//	console.log(userId)
+				 	$.ajax( 
+							{
+								url : "/user/json/checkDuplication/"+userId,
+								method : "POST" ,
+								dataType : "json" ,
+								headers : {
+									"Accept" : "application/json",
+									"Content-Type" : "application/json"
+								},
+								success : function(JSONData , status) {
+
+									//Debug...
+									//alert(status);
+									//alert("JSONData : \n"+JSONData);
+									//alert( "JSON.stringify(JSONData) : \n"+JSON.stringify(JSONData) );
+									//alert( JSONData != null );
+									
+									if(JSONData.message=="ok"){
+										//alert("사용 가능한 아이디입니다.")
+										console.log($('#checkDupl').text())
+										$('#checkDupl').text("사용 가능한 아이디입니다.")
+									}else if(JSONData.message!="ok"){
+										$('#checkDupl').text("이미 사용중인 아이디입니다.")
+									}
+								}
+						}); 
 			});
+			
+			
+			 $("form table[style] input[name='password2']").on("focusout", function(){
+				 //console.log("password2 :"+$("form table[style] input[name='password2']").val())
+				 //console.log("password :"+$("form table[style] input[name='password']").val())
+				 if(($("form table[style] input[name='password2']").val())==($("form table[style] input[name='password']").val())){
+					//alert("비밀번호와 비밀번호 확인이 일치합니다.")
+					//console.log($("form table[style] tr:nth-child(6)").html())
+					$("form table[style] tr:nth-child(6) td:last span").remove()
+					$("form table[style] tr:nth-child(6) td:last input").after('<span>비밀번호와 비밀번호 확인이 일치합니다</span>')
+				 }else{
+					 //alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.")
+					 console.log($("form table[style] tr:nth-child(6) td:last").html())
+					$("form table[style] tr:nth-child(6) td:last span").remove()
+					$("form table[style] tr:nth-child(6) td:last input").after('<span>비밀번호와 비밀번호 확인이 일치하지 않습니다</span>')
+				 }
+			 })
+			
 		});	
 
 	</script>		
@@ -188,21 +228,7 @@
 						<input 	type="text" name="userId" class="ct_input_bg" 
 										style="width:100px; height:19px"  maxLength="20" >
 					</td>
-					<td>
-						<table border="0" cellspacing="0" cellpadding="0">
-							<tr>
-								<td width="4" height="21">
-									<img src="/images/ct_btng01.gif" width="4" height="21"/>
-								</td>
-								<td align="center" background="/images/ct_btng02.gif" class="ct_btn" style="padding-top:3px;">
-									 ID중복확인
-								</td>
-								<td width="4" height="21">
-									<img src="/images/ct_btng03.gif" width="4" height="21"/>
-								</td>
-							</tr>
-						</table>
-					</td>
+					<td id="checkDupl"></td>
 				</tr>
 			</table>
 		</td>
