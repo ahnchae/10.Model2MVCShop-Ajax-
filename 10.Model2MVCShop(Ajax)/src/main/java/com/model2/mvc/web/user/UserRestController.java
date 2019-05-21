@@ -9,10 +9,12 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.model2.mvc.common.Page;
@@ -41,6 +43,26 @@ public class UserRestController {
 		System.out.println(this.getClass());
 	}
 	
+	@RequestMapping("/json/addCoupon")
+	public Map addCoupon(@RequestParam("couponId") String couponId, HttpSession session) throws Exception{
+		System.out.println("/user/addCoupon");
+			
+		User user = (User)session.getAttribute("user");
+		System.out.println("addCoupon user : "+ user);
+		userService.addCoupon(couponId, user);
+			
+		session.setAttribute("user", userService.getUser(((User)session.getAttribute("user")).getUserId()));
+		
+		Map map = new HashMap();
+		if(userService.getUser(((User)session.getAttribute("user")).getUserId()).getCoupon()!=null) {
+			map.put("message", "ok");
+		}else {
+			map.put("message", "no good");
+		}
+		
+		return map;
+	}
+	
 	@RequestMapping( value="json/getUser/{userId}", method=RequestMethod.GET )
 	public User getUser( @PathVariable String userId ) throws Exception{
 		
@@ -63,6 +85,7 @@ public class UserRestController {
 		if(dbUser!=null && user.getPassword().equals(dbUser.getPassword())){
 			System.out.println("비밀번호 일치");
 			session.setAttribute("user", dbUser);
+			System.out.println("~~~~~~~~~~~~~");
 			return dbUser;
 		}else if(dbUser!=null && !(user.getPassword().equals(dbUser.getPassword()))) {
 			System.out.println("비밀번호를 잘못 입력한 경우");
@@ -161,5 +184,11 @@ public class UserRestController {
 		returnMap.put("search", search);
 		
 		return returnMap;
+	}
+	
+	@ExceptionHandler(value=Exception.class)
+	public String error(Exception e) throws Exception{
+		e.printStackTrace();
+		return e.getMessage();
 	}
 }

@@ -15,38 +15,71 @@
 		<result property="ssn" 				column="ssn" 					jdbcType="VARCHAR" />
 		<result property="phone" 			column="cell_phone" 		jdbcType="VARCHAR" />
 		<result property="addr" 				column="addr" 					jdbcType="VARCHAR" />
-		<result property="email" 			column="email" 				jdbcType="NUMERIC"  />
+		<result property="email" 			column="email" 				jdbcType="VARCHAR"  />
 		<result property="regDate" 		column="reg_date" 			jdbcType="DATE" />
+ 		<association property="coupon" javaType="com.model2.mvc.common.Coupon">
+			<result property="discountCoupon10" column="discount_coupon10" jdbcType="CHAR"/>
+		</association>	
 	</resultMap>
+	
+	<sql id="user_coupon_column">
+		discount_coupon10
+	</sql>
 	
 	<!-- SQL : INSERT -->
 	<insert 	id="addUser"		parameterType="user" >
 	 	INSERT
 		INTO users( user_id , user_name , password , role , ssn, cell_phone, addr, email , reg_date) 
 		VALUES	 (	#{userId} , #{userName} , #{password} , 'user' , #{ssn:VARCHAR} , 
-							#{phone:VARCHAR} , #{addr:VARCHAR} , #{email:VARCHAR} , SYSDATE )
+							#{phone:VARCHAR} , #{addr:VARCHAR} , #{email:VARCHAR} , SYSDATE, null )
 	 </insert>
 	 
 	 <!-- SQL : SELECT ONE -->
 	 <select 	id="getUser"	parameterType="string"	resultMap="userSelectMap">
 		SELECT
-		user_id , user_name , password , role ,  cell_phone ,  addr , email , reg_date 		
-		FROM users 
-		WHERE user_id = #{value}
+		u.user_id , user_name , password , role ,  cell_phone ,  addr , email , reg_date, <include refid="user_coupon_column"/>		
+		FROM users u 
+		LEFT OUTER JOIN user_coupon uc ON uc.user_id=u.user_id
+		WHERE u.user_id = #{value}
 	 </select>
 	 
 	 <!-- SQL : UPDATE -->
 	 <update	id="updateUser"	parameterType="user" >
 	   	UPDATE users
 	   	<set>
-	   		user_name 	= #{userName} ,
-			cell_phone	= #{phone},
-			addr 				= #{addr} ,
-			email				=	#{email}
+	   	<if test="userName!=null">
+	   		user_name 	= #{userName:VARCHAR} ,
+		</if>
+		<if test="phone!=null">
+			cell_phone	= #{phone:VARCHAR},
+		</if>
+		<if test="addr!=null">
+			addr 				= #{addr:VARCHAR} ,
+		</if>
+		<if test="email!=null">
+			email				=	#{email:VARCHAR},
+	   	</if>
 	   	</set>
 	   	WHERE user_id = #{userId}
 	 </update>
-		 
+	 
+	 	 <!-- SQL : UPDATE -->
+	 <update	id="updateCoupon" parameterType="user" >
+	   	UPDATE user_coupon
+	   	<set>
+	   	<if test="coupon.discountCoupon10!=null">
+	   		discount_coupon10 = #{coupon.discountCoupon10} ,
+		</if>
+	   	</set>
+	   	WHERE user_id = #{userId}
+	 </update>
+	
+	<insert 	id="insertCoupon"		parameterType="user" >
+	 	INSERT
+		INTO user_coupon( user_id, <include refid="user_coupon_column"/>) 
+		VALUES	 (	#{userId} , #{coupon.discountCoupon10} )
+	 </insert>
+	 
 	<!-- SQL : SELECT LIST -->
 	<select  id="getUserList"  parameterType="search"	resultMap="userSelectMap">
 	  	SELECT *

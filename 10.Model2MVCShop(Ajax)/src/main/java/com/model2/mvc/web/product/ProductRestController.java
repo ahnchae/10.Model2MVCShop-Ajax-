@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +52,7 @@ public class ProductRestController {
 	//addProductView 보여주기
 	@RequestMapping(value="/json/addProduct", method=RequestMethod.GET)
 	public Map addProduct() throws Exception{
-		System.out.println("/product/addProduct : GET");
+		System.out.println("/product/json/addProduct : GET");
 		
 		Map map = new HashMap();
 		map.put("message", "ok");
@@ -60,7 +61,7 @@ public class ProductRestController {
 	
 	@RequestMapping(value="/json/addProduct", method=RequestMethod.POST)
 	public Map addProduct(@RequestBody Product product) throws Exception{
-		System.out.println("/product/addProduct : POST");
+		System.out.println("/product/json/addProduct : POST");
 		productService.addProduct(product);
 		Map map = new HashMap();
 		map.put("message", "ok");
@@ -68,15 +69,15 @@ public class ProductRestController {
 	}
 	
 	@RequestMapping("/json/getProduct/{prodNo}")
-	public Product getProduct(@PathVariable int prodNo, @RequestParam(value="menu", required=false) String menu) throws Exception{
-		System.out.println("/product/getProduct");
+	public Product getProduct(@PathVariable int prodNo) throws Exception{
+		System.out.println("/product/json/getProduct");
 		
 		return productService.getProduct(prodNo);
 	}
 	
 	@RequestMapping(value="/json/updateProduct", method=RequestMethod.GET)
 	public Map updateProduct() throws Exception{
-		System.out.println("/product/updateProduct : GET");	
+		System.out.println("/product/json/updateProduct : GET");	
 		
 		Map map = new HashMap();
 		map.put("message", "update GET");
@@ -85,7 +86,7 @@ public class ProductRestController {
 	
 	@RequestMapping(value="/json/updateProduct", method=RequestMethod.POST)
 	public Map updateProduct(@RequestBody Product product) throws Exception{
-		System.out.println("/product/updateProduct : POST");
+		System.out.println("/product/json/updateProduct : POST");
 		
 		productService.updateProduct(product);
 		
@@ -96,7 +97,7 @@ public class ProductRestController {
 	
 	@RequestMapping("/json/deleteProduct/{prodNo}")
 	public Map deleteProduct(@PathVariable int prodNo) throws Exception{
-		System.out.println("/product/deleteProduct/{prodNo}");
+		System.out.println("/product/json/deleteProduct/{prodNo}");
 		
 		productService.deleteProduct(prodNo);
 		
@@ -107,7 +108,7 @@ public class ProductRestController {
 	
 	@RequestMapping("/json/listProduct")
 	public Map listProduct(@RequestBody Search search) throws Exception{
-		System.out.println("/listProduct");
+		System.out.println("product/json/listProduct");
 		
 		if(search.getCurrentPage() ==0 ){
 			search.setCurrentPage(1);
@@ -125,5 +126,11 @@ public class ProductRestController {
 		returnmap.put("search", search);
 
 		return returnmap;
+	}
+	
+	@ExceptionHandler(value=Exception.class)
+	public String error(Exception e) throws Exception{
+		e.printStackTrace();
+		return e.getMessage();
 	}
 }

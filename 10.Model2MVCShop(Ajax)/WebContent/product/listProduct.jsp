@@ -28,13 +28,53 @@
 
 			$( ".ct_list_pop td:nth-child(3)" ).on("click" , function() {
 				var prodNo = $(this).next('td').next('td').next('td').next('td').text().trim();
-				var uri = "/product/getProduct?prodNo="+prodNo+"&menu=search";
+				//var uri = "/product/getProduct?prodNo="+prodNo+"&menu=search";
 				var tran=$(this).next('td').next('td').next('td').next('td').next('td').next('td').text().trim();
 				if('${param.menu}'=='manage' && tran=='판매중'){
 					uri = "/product/getProduct?prodNo="+prodNo+"&menu=manage";
+					self.location = uri;
+				}else{
+					if($( "#"+prodNo+"" ).html().length!=0){
+						$( "#"+prodNo+"" ).empty();
+					}else{
+					$.ajax(
+							{
+								url : "/product/json/getProduct/"+prodNo,
+								method : "GET",
+								dataType : "json",
+								headers : {
+									"Accept" : "application/json",
+									"Content-Type" : "application/json"
+								},
+								success : function(JSONData, status){
+									//alert(status);
+									//alert("JSONData : \n"+JSONData);
+									
+									var displayValue= "<h3>"+"상품번호: "+JSONData.prodNo+"<br>"
+															+"상품명: "+JSONData.prodName+"<br>"
+															+"상세 설명: "+JSONData.prodDetail+"<br>"
+															+"상품 이미지: <img src='../images/uploadFiles/"+JSONData.fileName+"'/><br>"
+															+"가격: "+JSONData.price+"<br>"
+															+"제조일: "+JSONData.manuDate+"<br>"
+															+"등록일: "+JSONData.regDate+"<br>"
+															+"<hr>";
+										if(JSONData.proTranCode=='1  '){
+										displayValue += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='/purchase/addPurchase?prodNo="+JSONData.prodNo+"'>"+JSONData.prodName+" 구매하기</a>"
+									}
+									displayValue += "</h3>"
+									$("#"+prodNo+"").html(displayValue);
+								},
+								error : function(jqXHR){
+									alert("url:"+"/product/json/getProduct/"+prodNo)
+									alert("error:"+jqXHR.status);
+								}
+							}
+						)
+					}
 				}
-				self.location = uri;
+				
 			})
+		
 			
 			$(".ct_list_pop:nth-child(4n+6)" ).css("background-color" , "whitesmoke");
 			$("h7").css("color" , "green");
@@ -195,11 +235,16 @@
 			</td>	
 			<td></td>
 			<td align="center">
-			<p><img src="../images/uploadFiles/${product.fileName}" width="100" height="100"/></p><%--${product.fileName} --%>
+				<c:if test="${!empty product.fileName}">
+					<p><img src="../images/uploadFiles/${product.fileName}" width="100" height="100"/></p><%--${product.fileName} --%>
+				</c:if>
+				<c:if test="${empty product.fileName}">
+					<p><img src="http://placehold.it/100x100"/> </p><%--${product.fileName} --%>
+				</c:if>
 			</td>
 		</tr>
 		<tr>
-			<td colspan="11" bgcolor="D6D7D6" height="1"></td>
+			<td id="${product.prodNo}" colspan="11" height="1"></td>
 		</tr>	
 	</c:forEach>
 	

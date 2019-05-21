@@ -50,4 +50,8 @@ public class UserDaoImpl implements UserDao{
 	public int getTotalCount(Search search) throws Exception {
 		return sqlSession.selectOne("UserMapper.getTotalCount", search);
 	}
+	
+	public void addCoupon(User user) throws Exception{
+		sqlSession.insert("UserMapper.insertCoupon", user);
+	}
 }

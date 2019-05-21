@@ -81,8 +81,11 @@
 									//==> 방법 1 , 2 , 3 결과 학인
 								}
 							},
-							error : function(){
-								alert("아이디, 패스워드를 확인하시고 다시 로그인 해 주세요")
+							error : function(jqXHR, textStatus, errorThrown){
+								alert("error: 아이디, 패스워드를 확인하시고 다시 로그인 해 주세요");
+								alert(jqXHR.status);
+								alert(errorThrown);
+								alert(textStatus);
 							}
 					}); 
 					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

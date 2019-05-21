@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PurchaseMapper">
+
+
+	<resultMap id="purchaseSelectMap" type="purchase">
+		<result property="divyAddr" column="DEMAILADDR" jdbcType="VARCHAR" />
+		<result property="divyDate" column="DLVY_DATE" jdbcType="DATE" />
+		<result property="divyRequest" column="DLVY_REQUEST" jdbcType="VARCHAR" />
+		<result property="paymentOption" column="PAYMENT_OPTION" jdbcType="CHAR" />
+		<result property="receiverName" column="RECEIVER_NAME" jdbcType="VARCHAR" />
+		<result property="orderDate" column="ORDER_DATA" jdbcType="DATE" />
+		<result property="receiverPhone" column="RECEIVER_PHONE" jdbcType="VARCHAR" />
+		<result property="tranCode" column="TRAN_STATUS_CODE" jdbcType="CHAR" />
+		<result property="tranNo" column="TRAN_NO" jdbcType="NUMERIC" />
+		<result property="soldPrice" column="sold_price" jdbcType="NUMERIC" />
+		<association property="buyer" javaType="user">
+			<id property="userId" column="buyer_id" jdbcType="VARCHAR"/> 
+			<result property="userName" column="user_name" jdbcType="VARCHAR"/>
+			<result property="password" 	column="password" 		jdbcType="VARCHAR" />
+			<result property="role" 				column="role" 					jdbcType="VARCHAR" />
+			<result property="ssn" 				column="ssn" 					jdbcType="VARCHAR" />
+			<result property="phone" 			column="cell_phone" 		jdbcType="VARCHAR" />
+			<result property="addr" 				column="addr" 					jdbcType="VARCHAR" />
+			<result property="email" 			column="email" 				jdbcType="VARCHAR"  />
+			<result property="regDate" 		column="ureg" 			jdbcType="DATE" />
+		</association>
+		<association property="purchaseProd" javaType="product">
+			<id property="prodNo" column="prod_no" jdbcType="VARCHAR"/> 
+			<result property="fileName" column="image_file" jdbcType="VARCHAR" />
+			<result property="manuDate" column="manufacture_Day" jdbcType="VARCHAR" />
+			<result property="price" column="price" jdbcType="NUMERIC" />
+			<result property="prodDetail" column="prod_detail" jdbcType="VARCHAR" />
+			<result property="prodName" column="prod_name" jdbcType="VARCHAR" />
+			<result property="prodNo" column="prod_no" jdbcType="INTEGER" />
+			<result property="regDate" column="prodreg" jdbcType="DATE" />
+			<result property="proTranCode" column="tran_status_code"
+				jdbcType="CHAR" />
+		</association>
+	</resultMap>
+
+	<!-- SQL : INSERT -->
+	<insert id="insertPurchase" parameterType="purchase">
+		INSERT INTO transaction 
+		(tran_no, prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date, sold_price) 
+		VALUES(seq_transaction_tran_no.nextval, #{purchaseProd.prodNo:NUMERIC}, #{buyer.userId:VARCHAR}, #{paymentOption:CHAR}, #{receiverName:VARCHAR}, #{receiverPhone:VARCHAR}, #{divyAddr:VARCHAR}, #{divyRequest:VARCHAR}, 2, SYSDATE, #{divyDate:DATE}, #{purchaseProd.price:NUMERIC})
+	</insert>
+
+	<!-- SQL : SELECT ONE -->
+	<select id="findPurchase" parameterType="int" resultMap="purchaseSelectMap">
+		SELECT
+		tran_no, t.prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date, sold_price,
+		prod_name , prod_detail , manufacture_day ,
+		price, image_file, p.reg_date prodreg,
+		user_name , password , role , ssn, cell_phone, addr, email , u.reg_date ureg
+		FROM transaction t
+		LEFT OUTER JOIN product p ON t.prod_no = p.prod_no
+		LEFT OUTER JOIN users u ON t.buyer_id = u.user_id
+		WHERE tran_no=#{_parameter} AND t.deleted IS NULL 
+	</select>
+	
+	<select id="findPurchase2" parameterType="int" resultMap="purchaseSelectMap">
+		SELECT
+		tran_no, t.prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date, sold_price,
+		prod_name , prod_detail , manufacture_day ,
+		price, image_file, p.reg_date prodreg,
+		user_name , password , role , ssn, cell_phone, addr, email , u.reg_date ureg
+		FROM transaction t
+		LEFT OUTER JOIN product p ON t.prod_no = p.prod_no
+		LEFT OUTER JOIN users u ON t.buyer_id = u.user_id 
+		WHERE t.prod_no=#{_parameter} AND t.deleted IS NULL 
+	</select>
+
+	<!-- SQL : UPDATE -->
+	<update id="updatePurchase" parameterType="purchase">
+		UPDATE transaction
+		<trim prefix="SET" prefixOverrides=",">
+			<if test="paymentOption!=null and paymentOption!=''">
+			payment_option=#{paymentOption}
+			</if>
+			<if test="receiverName!=null and receiverName!=''">
+			,receiver_name=#{receiverName}
+			</if>
+			<if test="receiverPhone!=null and receiverPhone!=''">
+			,receiver_phone=#{receiverPhone}
+			</if>
+			<if test="divyAddr!=null and divyAddr!=''">
+			,demailaddr=#{divyAddr}
+			</if>
+			<if test="divyRequest!=null and divyRequest!=''">
+			,dlvy_request=#{divyRequest}
+			</if>
+			<if test="divyDate!=null and divyDate!=''">
+			,dlvy_date=#{divyDate}
+			</if>
+		</trim>
+		WHERE prod_no=#{purchaseProd.prodNo}
+	</update>
+	
+	<!-- SQL : UPDATE 구매상태 수정하기: 배송하기-->
+	<update id="updateTranCode" parameterType="purchase">
+		UPDATE transaction
+		<trim prefix="SET">
+			<if test="tranCode!=null">
+			tran_status_code=#{tranCode}
+			</if>
+		</trim>
+		WHERE prod_no=#{purchaseProd.prodNo}
+	</update>
+
+	<!-- SQL : SELECT LIST -->
+	<select id="getPurchaseList" parameterType="map" resultMap="purchaseSelectMap">
+		SELECT *
+		FROM ( SELECT inner_table.* , ROWNUM AS row_seq
+				FROM ( SELECT
+						tran_no, t.prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date, 
+						prod_name , prod_detail , manufacture_day ,
+						price, image_file, p.reg_date prodreg,
+						user_name , password , role , ssn, cell_phone, addr, email , u.reg_date ureg
+						FROM transaction t
+						LEFT OUTER JOIN product p ON t.prod_no = p.prod_no
+						LEFT OUTER JOIN users u ON t.buyer_id = u.user_id
+						WHERE buyer_id = #{userId} AND t.deleted IS NULL 
+						ORDER BY tran_no
+						) inner_table
+						WHERE ROWNUM &lt;= #{search.endRowNum} )
+				WHERE row_seq BETWEEN #{search.startRowNum} AND #{search.endRowNum}
+	</select>
+	<!-- 위 두번째 subQuery 의 WHERE ROWNUM &lt;= #{endRowNum} ) 는 WHERE ROWNUM <= 
+		#{endRowNum} ) 의미이며.. < 는 keyword 로 &lt; 를 사용. <![CDATA[ ~~~ ]]> 를 이용하여 아래와 
+		같이 사용 할 수 있다. CDATA ==> Character Data 의 의미 Java 에서 \n 같은 특수문자 처리 WHERE ROWNUM 
+		<![CDATA[ <=]]> #{endRowNum} ) -->
+
+	<!-- SQL : SELECT ROW Count -->
+	<select id="getTotalCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM( SELECT
+			tran_no, prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date
+			FROM transaction
+			WHERE buyer_id = #{userId}) countTable
+	</select>
+
+	<!-- 구매취소 -->
+	<update id="deletePurchase" parameterType="int">
+		update transaction
+		<set>
+		deleted = '1' 
+		</set>
+		WHERE tran_no=#{_parameter}
+	</update>
+
+</mapper>

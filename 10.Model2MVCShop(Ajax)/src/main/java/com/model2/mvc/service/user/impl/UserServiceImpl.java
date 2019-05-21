@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.model2.mvc.common.Coupon;
 import com.model2.mvc.common.Search;
 import com.model2.mvc.service.domain.User;
-import com.model2.mvc.service.user.UserService;
-import com.model2.mvc.service.user.UserDao;;
+import com.model2.mvc.service.user.UserDao;
+import com.model2.mvc.service.user.UserService;;
 
 
 //==> 회원관리 서비스 구현
@@ -62,5 +63,24 @@ public class UserServiceImpl implements UserService{
 			result=false;
 		}
 		return result;
+	}
+
+	@Override
+	public void addCoupon(String couponId, User user) throws Exception {
+		// TODO Auto-generated method stub
+		Coupon coupon = new Coupon();
+		if(couponId!=null && couponId.equals("deleteDiscountCoupon10")) {
+			coupon.setDiscountCoupon10("0");
+		}
+		if(couponId!=null && couponId.equals("abcdefg")) {
+			coupon.setDiscountCoupon10("1");
+		}else if(couponId==null) {
+			return;
+		}else {
+			return;
+		}
+		
+		user.setCoupon(coupon);
+		userDao.addCoupon(user);
 	}
 }

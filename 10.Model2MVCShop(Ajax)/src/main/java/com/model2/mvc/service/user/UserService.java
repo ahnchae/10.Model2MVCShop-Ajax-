@@ -24,4 +24,6 @@ public interface UserService {
 	// 회원 ID 중복 확인
 	public boolean checkDuplication(String userId) throws Exception;
 	
+	//쿠폰 발급
+	public void addCoupon(String couponId, User user) throws Exception;
 }
