@@ -10,6 +10,10 @@
 
 	<link rel="stylesheet" href="/css/admin.css" type="text/css">
 	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  
 	<script type="text/javascript">
 		// 검색 / page 두가지 경우 모두 Form 전송을 위해 JavaScrpt 이용  
 		function fncGetUserList(currentPage) {
@@ -75,7 +79,41 @@
 				
 			})
 		
-			
+			 $('input[name="searchKeyword"]').on("keyup", function(){
+				//alert("success");
+				var searchKeyword = $(this).val();
+				var searchCondition = $('select[name=searchCondition]').val();
+				//console.log("searchKeyword:"+searchKeyword+"\nsearchCondition:"+searchCondition);
+				$.ajax( 
+						{
+							url : "/product/json/autoCompleteUser",
+							method : "POST" ,
+							data:JSON.stringify({
+								"searchKeyword" : searchKeyword, 
+								"searchCondition" : searchCondition		
+							}),
+							dataType : "text" ,
+							headers : {
+								"Accept" : "application/json",
+								"Content-Type" : "application/json"
+							},
+							success : function(JSONData , status) {
+
+								//Debug...
+								//alert(status);
+								//Debug...
+								//alert("JSONData : \n"+JSONData);
+								//alert("list : \n"+JSON.stringify(JSONData))
+								var jsonarr = $.parseJSON(JSONData);
+								//alert("jsonarr:\n"+jsonarr)
+								//var autoC = jsonarr;
+								//alert("autoC : \n"+autoC);
+								
+								$('input[name="searchKeyword"]').autocomplete({source : jsonarr});
+							}
+					}
+				)})
+				
 			$(".ct_list_pop:nth-child(4n+6)" ).css("background-color" , "whitesmoke");
 			$("h7").css("color" , "green");
 			

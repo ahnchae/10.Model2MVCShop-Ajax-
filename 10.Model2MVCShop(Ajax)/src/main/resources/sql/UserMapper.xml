@@ -80,6 +80,22 @@
 		VALUES	 (	#{userId} , #{coupon.discountCoupon10} )
 	 </insert>
 	 
+	<select id="getAutoComplete" parameterType='search' resultType='string'>
+	SELECT user_id , user_name , email
+	FROM users
+	<if test="searchCondition != null">
+		<where>
+			<if test="searchCondition == 0 and searchKeyword !='' ">
+ 				user_id LIKE '%'||#{searchKeyword}||'%'
+			</if>
+			<if test="searchCondition == 1 and searchKeyword !='' ">
+ 				user_name LIKE '%'||#{searchKeyword}||'%'
+			</if>
+		</where>
+	</if>
+	ORDER BY user_id 
+	</select> 
+	
 	<!-- SQL : SELECT LIST -->
 	<select  id="getUserList"  parameterType="search"	resultMap="userSelectMap">
 	  	SELECT *
@@ -89,10 +105,10 @@
 											<if test="searchCondition != null">
 												<where>
 													<if test="searchCondition == 0 and searchKeyword !='' ">
-										 				user_id = #{searchKeyword}
+										 				user_id LIKE '%'||#{searchKeyword}||'%'
 													</if>
 													<if test="searchCondition == 1 and searchKeyword !='' ">
-										 				user_name = #{searchKeyword}
+										 				user_name LIKE '%'||#{searchKeyword}||'%'
 													</if>
 												</where>
 											</if>

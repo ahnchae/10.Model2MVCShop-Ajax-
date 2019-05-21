@@ -1,5 +1,6 @@
 package com.model2.mvc.service.product.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -66,6 +67,23 @@ public class ProductDaoImpl implements ProductDao {
 	
 	public int getTotalCount(Search search) throws Exception {
 		return sqlSession.selectOne("ProductMapper.getTotalCount", search);
+	}
+
+	@Override
+	public List<String> getAutoComplete(Search search) throws Exception {
+		// TODO Auto-generated method stub
+		List<Product> list = sqlSession.selectList("ProductMapper.getAutoComplete", search);
+		List<String> returnList = new ArrayList();
+		if(search.getSearchCondition().equals("0")) {
+			for(Product prod : list) {
+				returnList.add(new Integer(prod.getProdNo()).toString());
+			}
+		}else if(search.getSearchCondition().equals("1")) {
+			for(Product prod : list) {
+				returnList.add(prod.getProdName());
+			}
+		}
+		return returnList;
 	}
 
 }

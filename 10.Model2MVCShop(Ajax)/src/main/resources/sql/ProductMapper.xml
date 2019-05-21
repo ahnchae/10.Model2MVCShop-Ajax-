@@ -19,6 +19,65 @@
 			jdbcType="CHAR" />
 	</resultMap>
 
+	<select id="getAutoComplete" parameterType='search' resultMap='productSelectMap'>
+	SELECT
+						p.prod_no, p.prod_name, p.prod_detail, p.manufacture_Day, p.price, p.image_file,
+						p.reg_date, t.tran_status_code
+						FROM product p, transaction t
+						<where>
+							t.prod_no(+) = p.prod_no AND p.deleted IS NULL 
+							<if test="searchCondition != null">
+								<if test="searchCondition==0 and searchKeyword!=''">
+									AND p.prod_no LIKE '%'||#{searchKeyword}||'%'
+								</if>
+								<if test="searchCondition==1 and searchKeyword!=''">
+									AND p.prod_name LIKE '%'||#{searchKeyword}||'%'
+								</if>
+								<if test="searchCondition==3">
+									AND t.tran_status_code IS NULL
+								</if>
+								<if test="searchCondition==4">
+									AND t.tran_status_code IN ('2  ')
+								</if>
+								<if test="searchCondition==5">
+									AND t.tran_status_code IN ('3  ')
+								</if>
+								<if test="searchCondition==6">
+									AND t.tran_status_code IN ('4  ')
+								</if>
+							</if>
+				
+							<if test="priceSearch">
+								<if test="searchKeyword1!=null and searchKeyword2 !=null">
+									<if test="searchKeyword1 &lt;= searchKeyword2">
+										AND p.price BETWEEN #{searchKeyword1} AND #{searchKeyword2}
+									</if>
+									<if test="searchKeyword1 &gt;= searchKeyword2">
+										AND p.price BETWEEN #{searchKeyword2} AND #{searchKeyword1}
+									</if>
+									<if test="searchKeyword1 !=null">
+										AND p.price &lt;= #{SearchKeyword1};
+									</if>
+								</if>
+							</if>
+						</where>
+				
+						<if test="sorting != null">
+							<if test="sorting=='priceASC'">
+								ORDER BY p.price
+							</if>
+							<if test="sorting=='priceDESC'">
+								ORDER BY p.price DESC
+							</if>
+							<if test="sorting=='prodNo'">
+								ORDER BY p.prod_no
+							</if>
+						</if>
+						<if test="sorting == null">
+							ORDER BY p.prod_no
+						</if>
+	</select> 
+
 	<!-- SQL : INSERT -->
 	<insert id="insertProduct" parameterType="product">
 		INSERT

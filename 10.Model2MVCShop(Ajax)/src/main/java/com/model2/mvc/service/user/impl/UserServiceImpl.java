@@ -83,4 +83,11 @@ public class UserServiceImpl implements UserService{
 		user.setCoupon(coupon);
 		userDao.addCoupon(user);
 	}
+
+	@Override
+	public List<String> autoCompleteUser(Search search) throws Exception {
+		// TODO Auto-generated method stub
+		
+		return userDao.getAutoComplete(search);
+	}
 }

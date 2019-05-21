@@ -1,6 +1,7 @@
 package com.model2.mvc.web.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -184,6 +185,21 @@ public class UserRestController {
 		returnMap.put("search", search);
 		
 		return returnMap;
+	}
+	
+	@RequestMapping(value="json/autoCompleteUser")
+	public List autoCompleteUser(@RequestBody Search search) throws Exception{
+		System.out.println("/user/json/autoCompleteUser");
+		
+		if(search.getCurrentPage() ==0 ){
+			search.setCurrentPage(1);
+		}
+		search.setPageSize(pageSize);
+		
+		// Business logic ผ๖วเ
+		List<String> list=userService.autoCompleteUser(search);
+		
+		return list;
 	}
 	
 	@ExceptionHandler(value=Exception.class)

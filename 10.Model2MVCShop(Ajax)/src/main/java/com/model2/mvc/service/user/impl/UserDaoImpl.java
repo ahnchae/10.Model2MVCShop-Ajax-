@@ -54,4 +54,8 @@ public class UserDaoImpl implements UserDao{
 	public void addCoupon(User user) throws Exception{
 		sqlSession.insert("UserMapper.insertCoupon", user);
 	}
+	
+	public List<String> getAutoComplete(Search search) throws Exception{
+		return sqlSession.selectList("UserMapper.getAutoComplete", search);
+	}
 }

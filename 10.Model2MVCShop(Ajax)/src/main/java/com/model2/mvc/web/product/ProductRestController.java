@@ -1,6 +1,7 @@
 package com.model2.mvc.web.product;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -126,6 +127,21 @@ public class ProductRestController {
 		returnmap.put("search", search);
 
 		return returnmap;
+	}
+	
+	@RequestMapping(value="json/autoCompleteUser")
+	public List autoCompleteUser(@RequestBody Search search) throws Exception{
+		System.out.println("/user/json/autoCompleteUser");
+		
+		if(search.getCurrentPage() ==0 ){
+			search.setCurrentPage(1);
+		}
+		search.setPageSize(pageSize);
+		
+		// Business logic ผ๖วเ
+		List<String> list=productService.autoCompleteProduct(search);
+		
+		return list;
 	}
 	
 	@ExceptionHandler(value=Exception.class)

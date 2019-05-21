@@ -13,7 +13,10 @@
 	<link rel="stylesheet" href="/css/admin.css" type="text/css">
 	
 	<!-- CDN(Content Delivery Network) 호스트 사용 -->
-	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script type="text/javascript">
 	
 		// 검색 / page 두가지 경우 모두 Form 전송을 위해 JavaScrpt 이용  
@@ -22,6 +25,8 @@
 			$("form").attr("method" , "POST").attr("action" , "/user/listUser").submit();
 		}
 
+		var autoC;
+		
 		//==>"검색" ,  userId link  Event 연결 및 처리
 		 $(function() {
 			 
@@ -81,7 +86,7 @@
 					)
 					};
 						////////////////////////////////////////////////////////////////////////////////////////////
-					
+
 			});
 			
 			//==> userId LINK Event End User 에게 보일수 있도록 
@@ -90,7 +95,47 @@
 			
 			//==> 아래와 같이 정의한 이유는 ??
 			$(".ct_list_pop:nth-child(4n+6)" ).css("background-color" , "whitesmoke");
-		});	
+			
+			
+			
+			
+ 			$('input[name="searchKeyword"]').on("keyup", function(){
+				//alert("success");
+				var searchKeyword = $(this).val();
+				var searchCondition = $('select[name=searchCondition]').val();
+				//console.log("searchKeyword:"+searchKeyword+"\nsearchCondition:"+searchCondition);
+				$.ajax( 
+						{
+							url : "/user/json/autoCompleteUser",
+							method : "POST" ,
+							data:JSON.stringify({
+								"searchKeyword" : searchKeyword, 
+								"searchCondition" : searchCondition		
+							}),
+							dataType : "text" ,
+							headers : {
+								"Accept" : "application/json",
+								"Content-Type" : "application/json"
+							},
+							success : function(JSONData , status) {
+
+								//Debug...
+								//alert(status);
+								//Debug...
+								//alert("JSONData : \n"+JSONData);
+								//alert("list : \n"+JSON.stringify(JSONData))
+								var jsonarr = $.parseJSON(JSONData);
+								autoC = jsonarr;
+								//alert("autoC : \n"+autoC);
+								
+								$('input[name="searchKeyword"]').autocomplete({source : autoC});
+							}
+					}
+				)})
+				
+				
+				
+			});
 		
 	</script>		
 	

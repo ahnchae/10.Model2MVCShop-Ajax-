@@ -25,4 +25,6 @@ public interface UserDao {
 	public int getTotalCount(Search search) throws Exception ;
 	
 	public void addCoupon(User user) throws Exception;
+	
+	public List<String> getAutoComplete(Search search) throws Exception;
 }

@@ -1,5 +1,6 @@
 package com.model2.mvc.service.user;
 
+import java.util.List;
 import java.util.Map;
 
 import com.model2.mvc.common.Search;
@@ -26,4 +27,7 @@ public interface UserService {
 	
 	//ÄíÆù ¹ß±Þ
 	public void addCoupon(String couponId, User user) throws Exception;
+	
+	//autoComplete
+	public List<String> autoCompleteUser(Search search) throws Exception;
 }
